@@ -1,5 +1,5 @@
-#ifndef MYUM7_H
-#define MYUM7_H
+#ifndef UM7_H
+#define UM7_H
 
 //////////////////////////////////////
 //      CONFIGURATION REGISTERS	    //
@@ -139,10 +139,10 @@
 
 #include <stdlib.h>
 
-class MYUM7 {
+class UM7 {
 
 public:
-	MYUM7(HardwareSerial &serial); // Constructor
+	UM7(HardwareSerial &serial); // Constructor
 	HardwareSerial *serial_port;
 	uint32_t error;
 

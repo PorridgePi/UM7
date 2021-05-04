@@ -1,4 +1,4 @@
-#include "MYUM7.h"
+#include "UM7.h"
 
 //////////////////////////////////////////
 //	READ FUNCTIONS FOR THE UM7	//
@@ -7,7 +7,7 @@
 /*
 	Default constructor. Initial state and serial port, pass as reference
 */
-MYUM7::MYUM7(HardwareSerial &serial) { 
+UM7::UM7(HardwareSerial &serial) { 
 	state = STATE_ZERO;
 	serial_port = &serial;
 }
@@ -18,7 +18,7 @@ MYUM7::MYUM7(HardwareSerial &serial) {
 	current_byte is current byte being read by serial.
 	decode() returns true if a packet was read succesfully (if checksum returns true).
 */
-bool MYUM7::decode(byte current_byte) {
+bool UM7::decode(byte current_byte) {
 
 	switch(state) {
 	case STATE_ZERO:
@@ -86,7 +86,7 @@ bool MYUM7::decode(byte current_byte) {
 	This function ties directly with decode() and calls save() if the checksum matches the parsed data.
 	checksum() returns true if a packet is read succesfully.
 */
-bool MYUM7::checksum() {
+bool UM7::checksum() {
 	checksum10 = ((checksum1 << 8) | checksum0);	// Combine checksum1 and checksum0
 	computed_checksum = 's' + 'n' + 'p' + packet_type + address;
 	for (int i = 0; i < data_length; i++) { // computed_checksum can only be 16bits long (2B)
@@ -104,7 +104,7 @@ bool MYUM7::checksum() {
 	The list of 'readable' registers by the UM7. Assigns the data[] variable to whatever dataset is beign read.
 	The function switches for each register case.
 */
-void MYUM7::save() {
+void UM7::save() {
 	switch (address) {
 
 	case DREG_HEALTH:
@@ -299,7 +299,7 @@ union combine {
 /*
 	Makes reading save() easier, this function reads a 4 byte register into a float (int32_t)
 */
-float MYUM7::read_register_as_float(int firstByte) { // For one register as an IEEE floatpoint
+float UM7::read_register_as_float(int firstByte) { // For one register as an IEEE floatpoint
 	floatval temp;
 	temp.bytes[3] = data[(firstByte)];
 	temp.bytes[2] = data[(firstByte + 1)];
@@ -311,7 +311,7 @@ float MYUM7::read_register_as_float(int firstByte) { // For one register as an I
 /*
 	Parses error into string outputs
 */
-void MYUM7::error_status() {
+void UM7::error_status() {
 	
 }
 
@@ -322,7 +322,7 @@ void MYUM7::error_status() {
 /*
 	Sets the UM7 baud rate. If not called, default is 115200bps.
 */
-void MYUM7::set_sensor_baud_rate(float baud) {
+void UM7::set_sensor_baud_rate(float baud) {
 	byte rate = 0;
 
 	if (baud == 9600) rate = 0x00;
@@ -364,7 +364,7 @@ void MYUM7::set_sensor_baud_rate(float baud) {
 	GPS bit = Causes GPS data to be transmitted automatically once received externally, stored as a batch from DREG_GPS_LATITUDE
 	SAT bit = Causes SAT data to be transmitted automatically once received externally, stored as batch DREG_GPS_SAT_1_2
 */
-void MYUM7::set_sensor_baud_rate(float baud, float gps_baud, bool gps, bool sat) {
+void UM7::set_sensor_baud_rate(float baud, float gps_baud, bool gps, bool sat) {
 	byte rate = 0, gps_rate = 0, b1 = 0, b0 = 0;
 
 	if (baud == 9600) rate = 0b0000;
@@ -416,7 +416,7 @@ void MYUM7::set_sensor_baud_rate(float baud, float gps_baud, bool gps, bool sat)
 	Sets the individual rates for the raw datasets. 
 	From 0 to 255 Hz, sent through their respective in their signed bytes.
 */
-void MYUM7::set_raw_rate(uint8_t accel_rate, uint8_t gyro_rate, uint8_t mag_rate) {
+void UM7::set_raw_rate(uint8_t accel_rate, uint8_t gyro_rate, uint8_t mag_rate) {
 	config_buffer[0] = 's';
 	config_buffer[1] = 'n';
 	config_buffer[2] = 'p';
@@ -440,7 +440,7 @@ void MYUM7::set_raw_rate(uint8_t accel_rate, uint8_t gyro_rate, uint8_t mag_rate
 /*
 	Sets the rate for all raw datasets to the same desired rate
 */
-void MYUM7::set_all_raw_rate(uint8_t rate) {
+void UM7::set_all_raw_rate(uint8_t rate) {
 	config_buffer[0] = 's';
 	config_buffer[1] = 'n';
 	config_buffer[2] = 'p';
@@ -464,7 +464,7 @@ void MYUM7::set_all_raw_rate(uint8_t rate) {
 /*
 	Sets the rate for the temperature datasets as well as raw datasets.
 */
-void MYUM7::set_all_raw_rate(uint8_t temp_rate, uint8_t rate) {
+void UM7::set_all_raw_rate(uint8_t temp_rate, uint8_t rate) {
 	config_buffer[0] = 's';
 	config_buffer[1] = 'n';
 	config_buffer[2] = 'p';
@@ -489,7 +489,7 @@ void MYUM7::set_all_raw_rate(uint8_t temp_rate, uint8_t rate) {
 	Sets the individual rates for the processed datasets. 
 	From 0 to 255 Hz, sent through their respective in their signed bytes.
 */
-void MYUM7::set_processed_rate(uint8_t accel_rate, uint8_t gyro_rate, uint8_t mag_rate) {
+void UM7::set_processed_rate(uint8_t accel_rate, uint8_t gyro_rate, uint8_t mag_rate) {
 	config_buffer[0] = 's';
 	config_buffer[1] = 'n';
 	config_buffer[2] = 'p';
@@ -513,7 +513,7 @@ void MYUM7::set_processed_rate(uint8_t accel_rate, uint8_t gyro_rate, uint8_t ma
 /*
 	Sets the rate for all processed datasets to the same desired rate
 */
-void MYUM7::set_all_processed_rate(uint8_t rate) {
+void UM7::set_all_processed_rate(uint8_t rate) {
 	config_buffer[0] = 's';
 	config_buffer[1] = 'n';
 	config_buffer[2] = 'p';
@@ -537,7 +537,7 @@ void MYUM7::set_all_processed_rate(uint8_t rate) {
 /*
 	Sets the rate for all quaternion datasets
 */
-void MYUM7::set_quaternion_rate(uint8_t rate) {
+void UM7::set_quaternion_rate(uint8_t rate) {
 	config_buffer[0] = 's';
 	config_buffer[1] = 'n';
 	config_buffer[2] = 'p';
@@ -561,7 +561,7 @@ void MYUM7::set_quaternion_rate(uint8_t rate) {
 /*
 	Sets the rate for all euler angle datasets
 */
-void MYUM7::set_euler_rate(uint8_t rate) {
+void UM7::set_euler_rate(uint8_t rate) {
 	config_buffer[0] = 's';
 	config_buffer[1] = 'n';
 	config_buffer[2] = 'p';
@@ -585,7 +585,7 @@ void MYUM7::set_euler_rate(uint8_t rate) {
 /*
 	Sets the rate for all position datasets
 */
-void MYUM7::set_position_rate(uint8_t rate) {
+void UM7::set_position_rate(uint8_t rate) {
 	config_buffer[0] = 's';
 	config_buffer[1] = 'n';
 	config_buffer[2] = 'p';
@@ -609,7 +609,7 @@ void MYUM7::set_position_rate(uint8_t rate) {
 /*
 	Sets the rate for all velocity datasets
 */
-void MYUM7::set_velocity_rate(uint8_t rate) {
+void UM7::set_velocity_rate(uint8_t rate) {
 	config_buffer[0] = 's';
 	config_buffer[1] = 'n';
 	config_buffer[2] = 'p';
@@ -633,7 +633,7 @@ void MYUM7::set_velocity_rate(uint8_t rate) {
 /*
 	Sets the rate for all position and euler angle datasets to the same desired rate
 */
-void MYUM7::set_pose_rate(uint8_t rate) {
+void UM7::set_pose_rate(uint8_t rate) {
 	config_buffer[0] = 's';
 	config_buffer[1] = 'n';
 	config_buffer[2] = 'p';
@@ -657,7 +657,7 @@ void MYUM7::set_pose_rate(uint8_t rate) {
 /*
 	Sets the rate for the health packet. Default is 1 Hz.
 */
-void MYUM7::set_health_rate(float baud) {
+void UM7::set_health_rate(float baud) {
 	byte rate = 0;
 
 	if (baud == 0.125) rate = 0x01;
@@ -690,7 +690,7 @@ void MYUM7::set_health_rate(float baud) {
 /*
 	Sets the rate for all gyro bias datasets
 */
-void MYUM7::set_gyro_bias_rate(uint8_t rate) {
+void UM7::set_gyro_bias_rate(uint8_t rate) {
 	config_buffer[0] = 's';
 	config_buffer[1] = 'n';
 	config_buffer[2] = 'p';
@@ -714,7 +714,7 @@ void MYUM7::set_gyro_bias_rate(uint8_t rate) {
 /*
 	Sets the rate for the NMEA health packet
 */
-void MYUM7::set_NMEA_health_rate(int8_t baud) {
+void UM7::set_NMEA_health_rate(int8_t baud) {
 	byte rate = 0;
 
 	if (baud == 1) rate = 0x10;
@@ -756,7 +756,7 @@ void MYUM7::set_NMEA_health_rate(int8_t baud) {
 /*
 	Sets the rate for the NMEA position and euler angle datasets
 */
-void MYUM7::set_NMEA_pose_rate(int8_t baud) {
+void UM7::set_NMEA_pose_rate(int8_t baud) {
 	byte rate = 0;
 
 	if (baud == 1) rate = 0x01;
@@ -798,7 +798,7 @@ void MYUM7::set_NMEA_pose_rate(int8_t baud) {
 /*
 	Sets the rate for the NMEA attitude datasets
 */
-void MYUM7::set_NMEA_attitude_rate(int8_t baud) {
+void UM7::set_NMEA_attitude_rate(int8_t baud) {
 	byte rate = 0;
 
 	if (baud == 1) rate = 0x10;
@@ -840,7 +840,7 @@ void MYUM7::set_NMEA_attitude_rate(int8_t baud) {
 /*
 	Sets the desired broadcast rate for NEMA sensor packets
 */
-void MYUM7::set_NMEA_sensor_rate(int8_t baud) {
+void UM7::set_NMEA_sensor_rate(int8_t baud) {
 	byte rate = 0;
 
 	if (baud == 1) rate = 0x01;
@@ -882,7 +882,7 @@ void MYUM7::set_NMEA_sensor_rate(int8_t baud) {
 /*
 	Sets the rate for the NMEA sensor datasets
 */
-void MYUM7::set_NMEA_rates_rate(int8_t baud) {
+void UM7::set_NMEA_rates_rate(int8_t baud) {
 	byte rate = 0;
 
 	if (baud == 1) rate = 0x10;
@@ -924,7 +924,7 @@ void MYUM7::set_NMEA_rates_rate(int8_t baud) {
 /*
 	Sets the rate for the NMEA GPS pose datasets
 */
-void MYUM7::set_NMEA_GPS_pose_rate(int8_t baud) {
+void UM7::set_NMEA_GPS_pose_rate(int8_t baud) {
 	byte rate = 0;
 
 	if (baud == 1) rate = 0x01;
@@ -966,7 +966,7 @@ void MYUM7::set_NMEA_GPS_pose_rate(int8_t baud) {
 /*
 	Sets the rate for the NMEA quaternion datasets
 */
-void MYUM7::set_NMEA_quaternion_rate(int8_t baud) {
+void UM7::set_NMEA_quaternion_rate(int8_t baud) {
 	byte rate = 0;
 
 	if (baud == 1) rate = 0x10;
@@ -1014,7 +1014,7 @@ void MYUM7::set_NMEA_quaternion_rate(int8_t baud) {
 	Q bit = Sensor will run in Quternion mode instead of Euler mode. Fixes pitch error in the Gimbal lock position
 	MAG bit = Magnetometer will be used in state updates
 */
-void MYUM7::set_misc_ssettings(bool pps, bool zg, bool q, bool mag) {
+void UM7::set_misc_ssettings(bool pps, bool zg, bool q, bool mag) {
 	uint8_t b1 = 0, b0 = 0;
 
 	if (pps) b1 = 0b00000001;
@@ -1053,7 +1053,7 @@ void MYUM7::set_misc_ssettings(bool pps, bool zg, bool q, bool mag) {
 /*
 	Configuration for hard setting the north orientation vector
 */
-void  MYUM7::set_home_north(float north) {
+void  UM7::set_home_north(float north) {
 	combine n = { north };
 
 	config_buffer[0] = 's';
@@ -1079,7 +1079,7 @@ void  MYUM7::set_home_north(float north) {
 /*
 	Configuration for hard setting the east orientation vector
 */
-void  MYUM7::set_home_east(float east) {
+void  UM7::set_home_east(float east) {
 	floatval e;
 	e.val = east;
 
@@ -1106,7 +1106,7 @@ void  MYUM7::set_home_east(float east) {
 /*
 	Configuration for hard setting the up orientation vector
 */
-void  MYUM7::set_home_up(float up) {
+void  UM7::set_home_up(float up) {
 	floatval u;
 	u.val = up;
 
@@ -1134,7 +1134,7 @@ void  MYUM7::set_home_up(float up) {
 	Configuration for the gyro trim in XYZ. It's calculated additioanly to the intial bias compensation (done in 
 	the ZERO_GYRO_BIAS command).
 */
-void  MYUM7::set_gyro_trim(float trim_x, float trim_y, float trim_z) {
+void  UM7::set_gyro_trim(float trim_x, float trim_y, float trim_z) {
 	for (int i = 0; i < 3; i++) {
 		floatval n;
 		if (i == 0) n.val = trim_x;
@@ -1168,7 +1168,7 @@ void  MYUM7::set_gyro_trim(float trim_x, float trim_y, float trim_z) {
 
 	3D array requires testing...
 */
-void  MYUM7::soft_iron_magnetometer_calibration(float (*array)[3][3]) {
+void  UM7::soft_iron_magnetometer_calibration(float (*array)[3][3]) {
 	for (int i = 0; i < 3; i++) { // Can cycle through addresses with the index
 		for (int j = 0; j < 3; j++) {
 			floatval n;
@@ -1201,7 +1201,7 @@ void  MYUM7::soft_iron_magnetometer_calibration(float (*array)[3][3]) {
 	Performs a hard-iron calibration of the magnetometer. These terms are computed from the RedShiftLabs
 	Serial Interface
 */
-void  MYUM7::hard_iron_magnetometer_calibration(float bias_x, float bias_y, float bias_z) {
+void  UM7::hard_iron_magnetometer_calibration(float bias_x, float bias_y, float bias_z) {
 	for (int i = 0; i < 3; i++) {
 		floatval n;
 		if (i == 0) n.val = bias_x;
@@ -1234,7 +1234,7 @@ void  MYUM7::hard_iron_magnetometer_calibration(float bias_x, float bias_y, floa
 
 	3D array requires testing...
 */
-void  MYUM7::accelerometer_misalignment_compensation(float (*array)[3][3]) {
+void  UM7::accelerometer_misalignment_compensation(float (*array)[3][3]) {
 	for (int i = 0; i < 3; i++) { // Can cycle through addresses with the index
 		for (int j = 0; j < 3; j++) {
 			floatval n;
@@ -1267,7 +1267,7 @@ void  MYUM7::accelerometer_misalignment_compensation(float (*array)[3][3]) {
 	Performs a calibration for the accelerometer bias in XYZ directions. These terms are computed from the RedShiftLabs
 	Serial Interface
 */
-void  MYUM7::accelerometer_calibration(float bias_x, float bias_y, float bias_z) {
+void  UM7::accelerometer_calibration(float bias_x, float bias_y, float bias_z) {
 	for (int i = 0; i < 3; i++) {
 		floatval n;
 		if (i == 0) n.val = bias_x;
@@ -1300,7 +1300,7 @@ void  MYUM7::accelerometer_calibration(float bias_x, float bias_y, float bias_z)
 
 	Does it work???
 */
-char* MYUM7::get_firmware_revision() {
+char* UM7::get_firmware_revision() {
 	cmd_buffer[0] = 's';
 	cmd_buffer[1] = 'n';
 	cmd_buffer[2] = 'p';
@@ -1324,7 +1324,7 @@ char* MYUM7::get_firmware_revision() {
 /*
 	Causes the UM7 to write all configuration settings to FLASH so that they will remain when the power is cycled.
 */
-void MYUM7::save_configs_to_flash() {
+void UM7::save_configs_to_flash() {
 	cmd_buffer[0] = 's';
 	cmd_buffer[1] = 'n';
 	cmd_buffer[2] = 'p';
@@ -1342,7 +1342,7 @@ void MYUM7::save_configs_to_flash() {
 /*
 	Causes the UM7 to load default factory settings.
 */
-void MYUM7::factory_reset() {
+void UM7::factory_reset() {
 	cmd_buffer[0] = 's';
 	cmd_buffer[1] = 'n';
 	cmd_buffer[2] = 'p';
@@ -1362,7 +1362,7 @@ void MYUM7::factory_reset() {
 	Causes the UM7 to measure the gyro outputs and set the output trim registers to compensate for any non-zero bias. 
 	The UM7 should be kept stationary while the zero operation is underway.
 */
-void MYUM7::zero_gyros() { // Doesn't check for COMMAND_COMPLETE byte, only sends cmd
+void UM7::zero_gyros() { // Doesn't check for COMMAND_COMPLETE byte, only sends cmd
 	cmd_buffer[0] = 's';
 	cmd_buffer[1] = 'n';
 	cmd_buffer[2] = 'p';
@@ -1381,7 +1381,7 @@ void MYUM7::zero_gyros() { // Doesn't check for COMMAND_COMPLETE byte, only send
 	Sets the current GPS latitude, longitude, and altitude as the home position. 
 	All future positions will be referenced to the current GPS position.
 */
-void  MYUM7::set_home_position() {
+void  UM7::set_home_position() {
 	cmd_buffer[0] = 's';
 	cmd_buffer[1] = 'n';
 	cmd_buffer[2] = 'p';
@@ -1399,7 +1399,7 @@ void  MYUM7::set_home_position() {
 /*
 	Sets the current yaw heading position as north.
 */
-void  MYUM7::set_mag_reference() {
+void  UM7::set_mag_reference() {
 	cmd_buffer[0] = 's';
 	cmd_buffer[1] = 'n';
 	cmd_buffer[2] = 'p';
@@ -1417,7 +1417,7 @@ void  MYUM7::set_mag_reference() {
 /*
 	Reboots the UM7 and performs a crude calibration on the accelerometers. Best performed on a flat surface.
 */
-void MYUM7::calibrate_accelerometers() {
+void UM7::calibrate_accelerometers() {
 	cmd_buffer[0] = 's';
 	cmd_buffer[1] = 'n';
 	cmd_buffer[2] = 'p';
@@ -1435,7 +1435,7 @@ void MYUM7::calibrate_accelerometers() {
 /*
 	Resets the EKF. Extended Kalman Filter (EKF)
 */
-void MYUM7::reset_kalman_filter() {
+void UM7::reset_kalman_filter() {
 	cmd_buffer[0] = 's';
 	cmd_buffer[1] = 'n';
 	cmd_buffer[2] = 'p';
