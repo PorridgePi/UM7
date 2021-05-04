@@ -78,6 +78,8 @@ bool UM7::decode(byte current_byte) {
 		state = STATE_ZERO;		// Entering state CHK0, save the byte as checksum0.  Next state will be state Zero.
 		checksum0 = current_byte;
 		return checksum();
+	default:
+		return false;
 	}
 }
 
