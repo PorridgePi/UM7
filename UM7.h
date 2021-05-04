@@ -197,7 +197,7 @@ public:
 	void factory_reset();
 
 	// EULER Variables
-	int16_t roll, pitch, yaw, roll_rate, pitch_rate, yaw_rate;
+	float roll, pitch, yaw, roll_rate, pitch_rate, yaw_rate;
 	float euler_time;
 
 	// QUATERNION Variables
