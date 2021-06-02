@@ -20,7 +20,7 @@
  *  *Most MCUs won't support these higher baud rates, you require a high speed UART.
  * 
  */
-#include <MYUM7.h>
+#include <UM7.h>
 
 // Setup one UM7 on Serial1 (TX1/RX1)
 MYUM7 imu(Serial1);
@@ -64,12 +64,14 @@ void setup() {
 }
 
 void loop() {
+  return;
+
   // Read data only when it's available from Serial1 on the MCU
-  if (Serial1.available()) {  
+//   if (Serial1.available()) {  
     
     // Reads byte from buffer, valid packet returns true and executes if statement.
-    if (imu.decode(Serial1.read())) {
-      Serial.print(micros()-init); Serial.print(", ");
+//     if (imu.decode(Serial1.read())) {
+//       Serial.print(micros()-init); Serial.print(", ");
       
       // Print all raw datasets (exluding times)
 //      Serial.print(imu.gyro_raw_x); Serial.print(", ");
@@ -98,17 +100,17 @@ void loop() {
 
 
       // Print all processed datasets (excluding times)
-      Serial.print(imu.gyro_x); Serial.print(", ");
-      Serial.print(imu.gyro_y); Serial.print(", ");
-      Serial.print(imu.gyro_z); Serial.print(", ");
+//       Serial.print(imu.gyro_x); Serial.print(", ");
+//       Serial.print(imu.gyro_y); Serial.print(", ");
+//       Serial.print(imu.gyro_z); Serial.print(", ");
       
-      Serial.print(imu.accel_x); Serial.print(", ");
-      Serial.print(imu.accel_y); Serial.print(", ");
-      Serial.print(imu.accel_z); Serial.print(", ");
+//       Serial.print(imu.accel_x); Serial.print(", ");
+//       Serial.print(imu.accel_y); Serial.print(", ");
+//       Serial.print(imu.accel_z); Serial.print(", ");
       
-      Serial.print(imu.mag_x); Serial.print(", ");
-      Serial.print(imu.mag_y); Serial.print(", ");
-      Serial.print(imu.mag_z); Serial.print(", ");
+//       Serial.print(imu.mag_x); Serial.print(", ");
+//       Serial.print(imu.mag_y); Serial.print(", ");
+//       Serial.print(imu.mag_z); Serial.print(", ");
 
 
       // Print all quaternion datasets (excluding times)
@@ -119,14 +121,32 @@ void loop() {
 
 
       // Print all euler datasets (excluding times)
-      Serial.print(imu.roll); Serial.print(", ");
-      Serial.print(imu.pitch); Serial.print(", ");
-      Serial.print(imu.yaw); Serial.print(", ");
-      Serial.print(imu.roll_rate); Serial.print(", ");
-      Serial.print(imu.pitch_rate); Serial.print(", ");
-      Serial.print(imu.yaw_rate); 
+//       Serial.print(imu.roll); Serial.print(", ");
+//       Serial.print(imu.pitch); Serial.print(", ");
+//       Serial.print(imu.yaw); Serial.print(", ");
+//       Serial.print(imu.roll_rate); Serial.print(", ");
+//       Serial.print(imu.pitch_rate); Serial.print(", ");
+//       Serial.print(imu.yaw_rate); 
       
-      Serial.print("\n"); // Must have \n on the last dataset for Arduino IDE graph
-     }
+//       Serial.print("\n"); // Must have \n on the last dataset for Arduino IDE graph
+//      }
+//   }
+}
+
+void serialEvent1() {
+  //  Reads byte from buffer, valid packet returns true and executes if statement.
+  if (imu.decode(Serial1.read())) {
+    Serial.print(micros()-init); Serial.print(", ");
+    Serial.print(imu.roll); Serial.print(", ");
+    Serial.print(imu.pitch); Serial.print(", ");
+
+    // Correct negative readings
+    if (imu.yaw < 0) {
+      Serial.print(360 + imu.yaw); Serial.print(", ");
+    } else {
+      Serial.print(imu.yaw); Serial.print(", ");
+    }
+
+    Serial.print("\n"); // Must have \n on the last dataset for Arduino IDE graph
   }
 }
